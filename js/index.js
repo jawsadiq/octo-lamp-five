@@ -21,10 +21,14 @@
 
 window.addEventListener('DOMContentLoaded', () => {
   const start = document.querySelector('#start');
+  
+  
+
   start.addEventListener('click', function (e) {
     document.querySelector('#quizBlock').style.display = 'block';
     start.style.display = 'none';
   });
+ 
   // quizArray QUESTIONS & ANSWERS
   // q = QUESTION, o = OPTIONS, a = CORRECT ANSWER
   // Basic ideas from https://code-boxx.com/simple-javascript-quiz/
@@ -44,6 +48,16 @@ window.addEventListener('DOMContentLoaded', () => {
       o: ['Sydney', 'Canberra', 'Melbourne', 'Perth'],
       a: 1,
     },
+    {
+      q: 'Which one is the name of Asutralia state?',
+      o: ['NSW', 'Multan','Dubai','Qatar'],
+      a: 0,
+    },
+    {
+      q: 'Which one is the name of flower?',
+      o: ['Blnaker', 'Cup', 'Rose', 'Bridge'],
+      a: 2,
+    }
   ];
 
   // function to Display the quiz questions and answers from the object
@@ -57,34 +71,111 @@ window.addEventListener('DOMContentLoaded', () => {
                     <li class="list-group-item" id="li_${index}_1"><input type="radio" name="radio${index}" id="radio_${index}_1"> ${quizItem.o[1]}</li>
                     <li class="list-group-item"  id="li_${index}_2"><input type="radio" name="radio${index}" id="radio_${index}_2"> ${quizItem.o[2]}</li>
                     <li class="list-group-item"  id="li_${index}_3"><input type="radio" name="radio${index}" id="radio_${index}_3"> ${quizItem.o[3]}</li>
+                   
                     </ul>
                     <div>&nbsp;</div>`;
       quizWrap.innerHTML = quizDisplay;
     });
   };
-
-  // Calculate the score
+  
+  start.addEventListener('click', startTimer);
+  
   const calculateScore = () => {
-    let score = 0;
-    quizArray.map((quizItem, index) => {
-      for (let i = 0; i < 4; i++) {
-        //highlight the li if it is the correct answer
-        let li = `li_${index}_${i}`;
-        let r = `radio_${index}_${i}`;
-        liElement = document.querySelector('#' + li);
-        radioElement = document.querySelector('#' + r);
+   
+   handleYourScore();
+   btnSubmit.disabled = true;
+   clearInterval(timerInterval);
+};
+ 
+  const quizDurationSeconds = 60; // Set the duration of the quiz in seconds
+let timeLeft = quizDurationSeconds;
+let timerInterval;
 
-        if (quizItem.a == i) {
-          //change background color of li element here
-        }
+// Get the timer elements and start button
+const timerElement = document.getElementById('time');
+// const startBtn = document.getElementById('startBtn');
 
-        if (radioElement.checked) {
-          // code for task 1 goes here
-        }
+// Function to start the countdown timer
+function startTimer() {
+  
+
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      handleTimeOver();
+      btnSubmit.disabled = true;
+      
+     
+    }
+  }, 1000);
+ console.log(quizArray.data);
+ 
+ 
+}
+
+function handleYourScore() {
+  let score = 0;
+  quizArray.map((quizItem, index) => {
+    for (let i = 0; i < 4; i++) {
+      //highlight the li if it is the correct answer
+      let li = `li_${index}_${i}`;
+      let r = `radio_${index}_${i}`;
+      let liElement = document.querySelector('#' + li);
+      let radioElement = document.querySelector('#' + r);
+
+      if (quizItem.a == i) {
+        // Change background color of li element for correct answer
+        liElement.style.backgroundColor = 'green';
       }
-    });
-  };
+
+      if (radioElement.checked && quizItem.a == i) {
+        // Increase score if the selected answer is correct
+        score++;
+      }
+      
+    }
+   
+  });
+
+  // Display the score
+  alert(`Your score: ${score}`);
+  
+}
+
+// Function to update the timer display
+function updateTimerDisplay() {
+  
+ 
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+ 
+}
+function handleTimeOver(){
+  alert('Time is over!'); // Display an alert when the time is over
+  handleYourScore();
+}
+
+  // Function to reload the page
+function reloadPage() {
+  window.location.reload();
+}
+  
+//   // Add event listener to submit button
+const btnSubmit = document.getElementById('btnSubmit');
+btnSubmit.addEventListener('click', calculateScore);
+
+
+// Add event listener to reset button
+const btnReset = document.getElementById('btnReset');
+btnReset.addEventListener('click', reloadPage);
 
   // call the displayQuiz function
   displayQuiz();
+  
 });
